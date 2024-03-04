@@ -7,6 +7,7 @@ _Fadesort_ is an implementation of a natural merge sort / stable quicksort hybri
 
 ### Agenda
 - Test and optimize performance
+- Add (up-to-date) visualization videos
 - Translate recursive, binary-search based merge decisions into stack-based algorithm (e.g. *TimSort*, *PowerSort*)
 - Assess benefits of "galloping merges"
     - Experiment with alternative methods to exploit run structure (preferably with minimal cost)
@@ -18,7 +19,7 @@ _Fadesort_ is an implementation of a natural merge sort / stable quicksort hybri
 Fadesort scans a given array once to identify inputs that are already sorted in descending or non-descending order, called _runs_. Descending runs are reversed, and unsorted data is sorted with quicksort. After all runs are formatted (sorted in non-descending order), they are merged.
 
 ## Merging
-Traditionally, merge sorts such as _TimSort_ use n / 2 elements worth of buffer space, merging two subarrays at a time by copying the smaller subarray into auxiliary memory. Fadesort tries to reduce memory transfers via multi-way merging and (if necessary) rotate merges.
+Traditionally, merge sorts such as _TimSort_ use n / 2 elements worth of buffer space, merging two subarrays at a time by copying the smaller subarray into auxiliary memory. Fadesort can use an arbitrary amount of external memory. Fadesort also tries to reduce memory transfers via multi-way merging and (if necessary) rotate merges.
 
 ### Normal merges
 The following diagrams illustrates normal merges for two runs, with arrows indicating merge direction.
