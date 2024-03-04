@@ -22,13 +22,13 @@ Traditionally, merge sorts such as _TimSort_ use n / 2 elements worth of buffer 
 
 ### Normal merges
 The following diagrams illustrates normal merges for two runs, with arrows indicating merge direction.
-1. **Merge up**
+1. **Merge up**\
     <img src="media/1.png" alt="" width="500px"/>
 
-2. **Merge down**
+2. **Merge down**\
     <img src="media/2.png" alt="" width="500px"/>
 
-3. **Merge out**
+3. **Merge out**\
     <img src="media/3.png" alt="" width="500px"/>
 
 ### Rotate merges
