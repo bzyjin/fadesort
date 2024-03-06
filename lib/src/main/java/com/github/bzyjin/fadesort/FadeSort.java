@@ -41,7 +41,7 @@ final class FadeSort<T> {
     /**
      * @return  a buffer with minimum size of type <T>.
      */
-    static <T> T[] getMinimalBuffer() {
+    static <T> T[] createMinimalBuffer() {
         return (T[]) new Object[MINIMUM_BUFFER_SIZE];
     }
 
@@ -165,7 +165,7 @@ final class FadeSort<T> {
             System.out.println(
                     "For performance, using minimum buffer size "
                     + MINIMUM_BUFFER_SIZE + ".");
-            ext = FadeSort.<T>getMinimalBuffer();
+            ext = FadeSort.<T>createMinimalBuffer();
         }
 
         // 2. Find all runs from left to right as TypedSubs
@@ -192,7 +192,7 @@ final class FadeSort<T> {
      */
     static <T> void sort(T[] arr, Comparator<? super T> cmp) {
         // Since buffer is not provided, use the minimum space possible.
-        sort(arr, FadeSort.<T>getMinimalBuffer(), 0, arr.length, cmp);
+        sort(arr, FadeSort.<T>createMinimalBuffer(), 0, arr.length, cmp);
     }
 
     /**
@@ -214,7 +214,7 @@ final class FadeSort<T> {
      * Sort [lst] ascending using a comparator [cmp], on 0..<[lst].size().
     */
     static <T> void sort(List<T> lst, Comparator<? super T> cmp) {
-        sort(lst, FadeSort.<T>getMinimalBuffer(), cmp);
+        sort(lst, FadeSort.<T>createMinimalBuffer(), cmp);
     }
 
     /**
