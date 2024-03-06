@@ -1,5 +1,6 @@
 package com.github.bzyjin.fadesort;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -8,7 +9,7 @@ import static java.lang.Math.min;
 
 /**
  * @author  bzyjin
- * @version 1.0
+ * @version 1.1
  *
  * The current implementation of QuickSort. It is a stable block-partition
  * quicksort that uses a bit array and prefix sum array for block swapping.
@@ -46,9 +47,9 @@ final class QuickSort<T> {
      *          array of size [n].
      */
     private static int sampleSize(int n) {
-        // return min(SAMPLE_SPACE, max(1, FadeSort.log2F(n) | 1));
+        // return min(SAMPLE_SPACE, FadeSort.log2F(n) | 1);
         // (alternative equation)
-        return min(SAMPLE_SPACE, max(1, 2 + (int) Math.cbrt(n) | 1));
+        return min(SAMPLE_SPACE, 2 + (int) Math.cbrt(n) | 1);
     }
 
     /**
@@ -101,6 +102,7 @@ final class QuickSort<T> {
 
         scan:
         for (int i = start;;) {
+            // Fill buffer with 'w' elements
             for (y = 0;;) {
                 if (i == end) break scan;
                 T cur = arr[i++];
@@ -167,23 +169,52 @@ final class QuickSort<T> {
         if (cnt <= 0) return start + r;
 
         blocks.buildSums();
-        int cnt0 = cnt - blocks.cardinality(cnt); // Number of zero blocks
+        int cnt0    = cnt - blocks.cardinality(cnt), // Number of zero blocks
+            swapLen = Math.max(2, cnt >> 5);
 
         // 1. Apply cycle sort to blocks
         BitPSA status = new BitPSA(cnt);
+        int[] path  = new int[swapLen];
 
         for (int i = 0; i < cnt0; ++i) {
+
+            // Check if block is already in its proper place
             if (!status.get(i)) {
+                int l = start + i * w,
+                    next = destination(blocks, i, cnt0);
+
+                do {
+                    // Generate path segment
+                    int j;
+                    for (j = 0; j < swapLen && next != i; ++j) {
+                        path[j] = next;
+                        status.set(next);
+                        next = destination(blocks, next, cnt0);
+                    }
+
+                    if (j < 1) break;
+
+                    // Suspend last block
+                    int prev = path[--j];
+                    FadeSort.suspend(arr,
+                            start + prev * w, start + prev * w + w, ext);
+
+                    // Shift all blocks to their proper destination
+                    for (--j; j >= 0; --j) {
+                        int cur = path[j];
+                        FadeSort.move(arr, start + cur * w, start + cur * w + w,
+                                arr, start + prev * w);
+                        prev = cur;
+                    }
+
+                    // Copy swap block to empty space
+                    FadeSort.move(arr, l, l + w, arr, start + path[0] * w);
+
+                    // Copy suspended block to swap block
+                    FadeSort.move(ext, 0, w, arr, l);
+                } while (next != i);
+
                 status.set(i);
-                int next = destination(blocks, i, cnt0);
-
-                while (next != i) {
-                    FadeSort.swapBlocks(arr, ext,
-                            start + i * w, start + next * w, w);
-
-                    status.set(next);
-                    next = destination(blocks, next, cnt0);
-                }
             }
         }
 
@@ -193,7 +224,6 @@ final class QuickSort<T> {
 
         // 3. Rotate remainder to the end of 0-blocks
         int endBlocks = start + cnt * w;
-
         FadeSort.suspend(arr, endBlocks, endBlocks + r, ext);
         FadeSort.move(arr, end0, endBlocks, arr, end0 + r);
         FadeSort.move(ext, 0, r, arr, end0);
@@ -225,7 +255,7 @@ final class QuickSort<T> {
             int y = 0;
             T piv = selectPivot(ext, 0, count, cmp);
 
-            // a. Single partition
+            // Parition once
             for (int i = 0; i < count; ++i) {
                 T cur = ext[i];
 
@@ -233,7 +263,7 @@ final class QuickSort<T> {
                 else                                arr[ins++]  = cur;
             }
 
-            // b. Update partitions
+            // Update partitions
             SUBARR[cnt++] = new Sub(arr, ins - count + y, ins);
             count = y;
         }
@@ -264,6 +294,7 @@ final class QuickSort<T> {
         int amount = sampleSize(end - start),
             w = (end - start) / (amount + 1);
 
+        // 1. Get distributed samples
         for (int i = 1; i <= amount; ++i) {
             int ind = start + i * w;
 
@@ -271,6 +302,7 @@ final class QuickSort<T> {
                     localMedian(arr, ind, cmp) : arr[ind];
         }
 
+        // 2. Sort samples and pick middle element
         InsertionSort.sort((T[]) PIVOTS, 0, amount, cmp);
         return (T) PIVOTS[amount >> 1];
     }
