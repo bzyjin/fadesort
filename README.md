@@ -3,7 +3,7 @@ _Fadesort_ is an implementation of a natural merge sort / stable quicksort hybri
 
 | stable? | best | average | worst | space |
 |:-:|:-:|:-:|:-:|:-:|
-| `yes` | `O(n)` | `O(n log n)` | `wip` | `min. O(√n)` |
+| `yes` | `O(n)` | `O(n log n)` | `wip` | `Ω(√n)` |
 
 ### Agenda
 - Test and optimize performance
@@ -14,6 +14,7 @@ _Fadesort_ is an implementation of a natural merge sort / stable quicksort hybri
 - Develop a fallback sorting algorithm (i.e. plain merge sort) for when quicksort degrades
     - Possibly avert this with a proper pivot selection algorithm
 - Develop a more rigorous test suite for stability checking
+- Unroll some loops
 
 ## Scanning
 Fadesort scans a given array once to identify inputs that are already sorted in descending or non-descending order, called _runs_. Descending runs are reversed, and unsorted data is sorted with quicksort. After all runs are formatted (sorted in non-descending order), they are merged.
@@ -100,7 +101,7 @@ Notice that we have non-full `0` and `1` blocks at the end -- we will handle thi
 ### Block sorting
 We now have to arrange the partition i.e. put all `0` blocks to the left of the `1` blocks. Fadesort achieves this with a stable variant of *cycle sort* (which is commonly used) that sorts the blocks in linear time.
 
-Fadesort uses a bit-array implementation with a prefix sum array to query cardinality up to a certain index; these are used to count `0` and `1` blocks. The structure should store 96 bits for every 64 blocks. Because there are at most `floor(n / w)` blocks, which means sorting a partition requires `O(n / w)` space complexity -- that is to say, the minimum space complexity for the overall quicksort algorithm is `O(√n)`. The constant factor may vary based on the size of the data type to be sorted.
+Fadesort uses a bit-array implementation with a prefix sum array to query cardinality up to a certain index; these are used to count `0` and `1` blocks. The block rearrangement tries to use less than 3 bits on average for every block. Because there are at most `floor(n / w)` blocks, which means sorting a partition requires `O(n / w)` space complexity -- that is to say, the minimum space complexity for the overall quicksort algorithm is `Ω(√n)`. The constant factor may vary based on the size of the data type to be sorted.
 
 Once sorted with cycle sort, our array looks like this:
 
