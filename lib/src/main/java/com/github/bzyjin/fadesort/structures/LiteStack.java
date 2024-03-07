@@ -8,7 +8,7 @@ package com.github.bzyjin.fadesort;
  *
  * A bare-bones implementation of a stack.
  */
-public class LiteStack<T> {
+class LiteStack<T> {
 
     /** The last added item. */
     private LiteStackNode<T> top = null;
@@ -33,6 +33,13 @@ public class LiteStack<T> {
         T res = this.top.val;
         this.top = this.top.next;
         return res;
+    }
+
+    /**
+     * @return  the last added item of this stack.
+     */
+    T top() {
+        return this.top.val;
     }
 
     /**

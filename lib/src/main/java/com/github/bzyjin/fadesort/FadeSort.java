@@ -19,7 +19,7 @@ import static java.lang.Math.min;
  * three-way merges, and is backed by a block-partition quicksort for "unsorted"
  * data.
  */
-final class FadeSort<T> {
+public final class FadeSort<T> {
 
     /** Minimum buffer size to mitigate performance degradation. */
     static final int MINIMUM_BUFFER_SIZE = 24;
@@ -50,7 +50,8 @@ final class FadeSort<T> {
      *          natural merging for an array of size [n].
      */
     static int minimumRunLength(int n) {
-        return n <= 256 ? 4 + (n >> 6) : (int) (Math.sqrt(n) / 1);
+        // Avg. 2 sqrt(n) increasing subarrays in "random" data
+        return n <= 256 ? 4 + (n >> 6) : (int) (Math.sqrt(n) / 2);
     }
 
     /**
@@ -300,7 +301,7 @@ final class FadeSort<T> {
         for (int i = 1; i < runs.length; ++i) {
             Sub cur = runs[i];
 
-            sortRun((TypedSub) cur, ext, cmp);
+            sortRun((TypedSub<T>) cur, ext, cmp);
             if (cmp.compare(arr[cur.left - 1], arr[cur.left]) <= 0) {
                 res.peekLast().right = cur.right;
             }

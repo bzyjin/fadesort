@@ -10,7 +10,7 @@ package com.github.bzyjin.fadesort;
  * the barebones functionality necessary for block partitioning is implemented,
  * so this is NOT A FULL BIT ARRAY IMPLEMENTATION.
  */
-public class BitPSA {
+class BitSumArray {
 
     private static final int    STRING_BITS = 6,
                                 STRING_SIZE = 1 << STRING_BITS;
@@ -46,19 +46,19 @@ public class BitPSA {
     }
 
     /** Constructor. */
-    BitPSA(int n) {
+    BitSumArray(int n) {
         this.n              = n;
         this.stringCount    = (n + STRING_SIZE - 1) >> STRING_BITS;
         this.strings        = new long[this.stringCount];
-        this.psa            = new int[this.stringCount];
     }
 
     /**
      * Construct the PSA for fast sum queries.
      */
     void buildSums() {
-        this.psa[0] = Long.bitCount(this.strings[0]);
+        this.psa = new int[this.stringCount];
 
+        this.psa[0] = Long.bitCount(this.strings[0]);
         for (int i = 1; i < this.stringCount; ++i) {
             this.psa[i] = Long.bitCount(this.strings[i]) + this.psa[i - 1];
         }
@@ -87,8 +87,7 @@ public class BitPSA {
         if (end <= 0) return 0;
 
         int stringIndex = indexOfString(end);
-        return
-                this.psa[stringIndex] -
+        return this.psa[stringIndex] -
                 Long.bitCount(this.strings[stringIndex] >>> indexInString(end));
     }
 

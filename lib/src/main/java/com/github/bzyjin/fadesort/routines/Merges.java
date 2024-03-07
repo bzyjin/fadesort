@@ -1,5 +1,6 @@
 package com.github.bzyjin.fadesort;
 
+import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.stream.IntStream;
 import static java.lang.Math.max;
@@ -112,8 +113,7 @@ final class Merges<T> {
 
         int i = start;
         for (; i < end && l < ml && r < mr; ++i) {
-            boolean doA = cmp.compare(aux[l], aux[r]) <= 0;
-            arr[i] = doA ? aux[l++] : aux[r++];
+            arr[i] = cmp.compare(aux[l], aux[r]) <= 0 ? aux[l++] : aux[r++];
         }
 
         if (r == mr)    FadeSort.move(aux, l, ml, arr, i);
@@ -142,23 +142,23 @@ final class Merges<T> {
         // 2. Get rotate merge radius and create new subarrays
         int rad = mergeRadius(a, b, cmp),   midA = a.right - rad,
                                             midB = b.left + rad;
-        Sub<T>  c1 = new Sub(arr, a.left, midA),
-                c2 = new Sub(arr, midA, a.right),
-                c3 = new Sub(arr, b.left, midB),
-                c4 = new Sub(arr, midB, b.right);
+        Sub<T>  s1 = new Sub(arr, a.left, midA),
+                s2 = new Sub(arr, midA, a.right),
+                s3 = new Sub(arr, b.left, midB),
+                s4 = new Sub(arr, midB, b.right);
 
         // 3. Skip rotation if possible
         if (rad <= ext.length) {
-            c2 = FadeSort.suspend(c2, ext);
-            mergeDown2(c1, c3, a, cmp);
-            mergeUp2(c2, c4, b, cmp);
+            s2 = FadeSort.suspend(s2, ext);
+            mergeDown2(s1, s3, a, cmp);
+            mergeUp2(s2, s4, b, cmp);
         }
 
         // 4. Rotate and merge again
         else {
             FadeSort.swapBlocksSafe(arr, ext, midA, b.left, rad);
-            mergeIn2(c1, c2, ext, cmp);
-            mergeIn2(c3, c4, ext, cmp);
+            mergeIn2(s1, s2, ext, cmp);
+            mergeIn2(s3, s4, ext, cmp);
         }
 
         return res;
@@ -173,12 +173,11 @@ final class Merges<T> {
      */
     static <T> Sub<T> mergeUp3(Sub<T> a, Sub<T> b, Sub<T> c,
             T[] ext, Comparator<? super T> cmp) {
-        Sub<T>  ab = new Sub(ext, 0, a.size() + b.size()),
+        Sub<T>  ab  = new Sub(ext, 0, a.size() + b.size()),
                 res = Subs.join(a, c);
 
         mergeOut2(a, b, ab, cmp);
         mergeUp2(ab, c, res, cmp);
-
         return res;
     }
 
@@ -191,12 +190,11 @@ final class Merges<T> {
      */
     static <T> Sub<T> mergeDown3(Sub<T> a, Sub<T> b, Sub<T> c, T[] ext,
             Comparator<? super T> cmp) {
-        Sub<T>  bc = new Sub(ext, 0, b.size() + c.size()),
+        Sub<T>  bc  = new Sub(ext, 0, b.size() + c.size()),
                 res = Subs.join(a, c);
 
         mergeOut2(b, c, bc, cmp);
         mergeDown2(a, bc, res, cmp);
-
         return res;
     }
 

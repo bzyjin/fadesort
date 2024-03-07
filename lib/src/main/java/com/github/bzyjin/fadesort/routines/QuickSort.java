@@ -2,6 +2,7 @@ package com.github.bzyjin.fadesort;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import static java.lang.Math.cbrt;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 /** End of imports. */
@@ -49,7 +50,7 @@ final class QuickSort<T> {
     private static int sampleSize(int n) {
         // return min(SAMPLE_SPACE, FadeSort.log2F(n) | 1);
         // (alternative equation)
-        return min(SAMPLE_SPACE, 2 + (int) Math.cbrt(n) | 1);
+        return min(SAMPLE_SPACE, 2 + (int) cbrt(n) | 1);
     }
 
     /**
@@ -92,13 +93,13 @@ final class QuickSort<T> {
             Comparator<? super T> cmp, Condition cnd) {
         int x   = start,    // ptr in [arr] for items that satisfy [cnd]
             y   = 0,        // ptr in [ext] for items that do not satisfy [cnd]
-            n   = end - start,          // size of subarray to sort
-            w   = ext.length,           // size of work array
-            cap = (n + w - 1) / w + 1,  // max # of blocks
-            cnt = 0;                    // count # of blocks
+            n   = end - start,      // size of subarray to sort
+            w   = ext.length,       // size of work array
+            cap = (n + w - 1) / w,  // max # of blocks
+            cnt = 0;                // count # of blocks
 
         // 1. Partition into blocks
-        BitPSA blocks = new BitPSA(cap);
+        BitSumArray blocks = new BitSumArray(cap);
 
         scan:
         for (int i = start;;) {
@@ -114,15 +115,15 @@ final class QuickSort<T> {
                 else arr[x++] = cur;
             }
 
-            int pre = (x - start) / w,  // # of preceding blocks
-                dest = start + pre * w; // destination index
+            int prec = (x - start) / w,     // # of preceding blocks
+                dest = start + prec * w;    // destination index
 
             // Shift the remainder right and copy partitioned block
             FadeSort.move(arr, dest, x, arr, dest + w);
             FadeSort.move(ext, 0, w, arr, dest);
 
-            blocks.set(pre);
-            cnt = pre + 1;
+            blocks.set(prec);
+            cnt = prec + 1;
             x += w;
         }
 
@@ -165,16 +166,16 @@ final class QuickSort<T> {
      * @return  the starting index of the 1s subarray.
      */
     private static <T> int arrangePartition(T[] arr, T[] ext, int start,
-            BitPSA blocks, int cnt, int w, int r) {
+            BitSumArray blocks, int cnt, int w, int r) {
         if (cnt <= 0) return start + r;
 
         blocks.buildSums();
-        int cnt0    = cnt - blocks.cardinality(cnt), // Number of zero blocks
-            swapLen = Math.max(2, cnt >> 5);
+        int cnt0    = cnt - blocks.cardinality(cnt),    // # of zero blocks
+            swapLen = max(2, cnt >> 5);
 
         // 1. Apply cycle sort to blocks
-        BitPSA status = new BitPSA(cnt);
-        int[] path  = new int[swapLen];
+        BitSumArray status = new BitSumArray(cnt);
+        int[] path = new int[swapLen];
 
         for (int i = 0; i < cnt0; ++i) {
 
@@ -184,8 +185,9 @@ final class QuickSort<T> {
                     next = destination(blocks, i, cnt0);
 
                 do {
-                    // Generate path segment
                     int j;
+
+                    // Generate path segment
                     for (j = 0; j < swapLen && next != i; ++j) {
                         path[j] = next;
                         status.set(next);
@@ -280,7 +282,7 @@ final class QuickSort<T> {
      * @return  the destination index for binary cycle sort from index [i],
      *          with [cnt0] zeroes and binary array context [blocks].
      */
-    private static <T> int destination(BitPSA blocks, int i, int cnt0) {
+    private static <T> int destination(BitSumArray blocks, int i, int cnt0) {
         int offset = blocks.cardinality(i);
         return blocks.get(i) ? cnt0 + offset : i - offset;
     }
