@@ -29,7 +29,7 @@ class BitSumArray {
     }
 
     /**
-     * @return  the index within a string than an overall index of [i]
+     * @return  the index within a string that an overall index of [i]
      *          corresponds to.
      */
     private static int indexInString(int i) {
