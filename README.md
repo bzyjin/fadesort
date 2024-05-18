@@ -20,6 +20,9 @@ _Fadesort_ is an implementation of a natural merge sort / stable quicksort hybri
 Fadesort scans a given array once to identify inputs that are already sorted in descending or non-descending order, called _runs_. Descending runs are reversed, and unsorted data is sorted with quicksort. After all runs are formatted (sorted in non-descending order), they are merged.
 
 ## Merging
+
+<video src='media/runs.mp4' width="500px"/>
+
 Traditionally, merge sorts such as _TimSort_ use n / 2 elements worth of buffer space, merging two subarrays at a time by copying the smaller subarray into auxiliary memory. Fadesort can use an arbitrary (with a lower bound) amount of external memory. Fadesort also tries to reduce memory transfers via multi-way merging and (if necessary) rotate merges.
 
 ### Normal merges
@@ -80,6 +83,9 @@ Of course, we can extend this idea to 4 subarrays `a`, `b`, `c`, and `d`:
 **Fadesort does not implement four-way merging.**
 
 ## Block quicksort
+
+<video src='media/shuffled.mp4' width="500px"/>
+
 The assumption is made that the reader understands the principles of _stable quicksort_. Block quicksort is simply an extension of stable quicksort for an arbitrary buffer length within `1..n`. Fadesort uses all of the buffer space available and assigns the block size `w` to be `buffer.length`.
 
 ### Partitioning
@@ -98,8 +104,10 @@ in which case we just copy it back to the end of the main array.
 
 Notice that we have non-full `0` and `1` blocks at the end -- we will handle this later.
 
+Note -- the partitioning implementation is likely to be very similar to ["Aeos Quicksort"](https://www.youtube.com/watch?v=_YTl2VJnQ4s).
+
 ### Block sorting
-We now have to arrange the partition i.e. put all `0` blocks to the left of the `1` blocks. Fadesort achieves this with a stable variant of *cycle sort* (which is commonly used) that sorts the blocks in linear time.
+We now have to arrange the partition i.e. put all `0` blocks to the left of the `1` blocks. Fadesort achieves this with a stable variant of *cycle sort* that sorts the blocks in linear time.
 
 Fadesort uses a bit-array implementation with a prefix sum array to query cardinality up to a certain index; these are used to count `0` and `1` blocks. The block rearrangement tries to use less than 3 bits on average for every block. Because there are at most `floor(n / w)` blocks, sorting a partition requires `O(n / w)` space complexity -- as a result, the minimum space complexity for the overall quicksort algorithm is `Ω(√n)`.
 
