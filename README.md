@@ -21,7 +21,7 @@ Fadesort scans a given array once to identify inputs that are already sorted in 
 
 ## Merging
 
-<video src='media/runs.mp4' width="500px"/>
+<video src='media/runs.mp4' width="500px"></video>
 
 Traditionally, merge sorts such as _TimSort_ use n / 2 elements worth of buffer space, merging two subarrays at a time by copying the smaller subarray into auxiliary memory. Fadesort can use an arbitrary (with a lower bound) amount of external memory. Fadesort also tries to reduce memory transfers via multi-way merging and (if necessary) rotate merges.
 
@@ -84,7 +84,7 @@ Of course, we can extend this idea to 4 subarrays `a`, `b`, `c`, and `d`:
 
 ## Block quicksort
 
-<video src='media/shuffled.mp4' width="500px"/>
+<video src='media/shuffled.mp4' width="500px"></video>
 
 The assumption is made that the reader understands the principles of _stable quicksort_. Block quicksort is simply an extension of stable quicksort for an arbitrary buffer length within `1..n`. Fadesort uses all of the buffer space available and assigns the block size `w` to be `buffer.length`.
 
