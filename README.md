@@ -3,7 +3,7 @@ _Fadesort_ is an implementation of a natural merge sort / stable quicksort hybri
 
 | stable? | best | average | worst | space |
 |:-:|:-:|:-:|:-:|:-:|
-| `yes` | `O(n)` | `O(n log n)` | `wip` | `Ω(√n)` |
+| `yes` | `O(n)` | `O(n log n)` | `wip` | `min. O(√n)` |
 
 ### Agenda
 - Test and optimize performance
