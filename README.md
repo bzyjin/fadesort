@@ -109,7 +109,7 @@ Note -- the partitioning implementation is likely to be very similar to ["Aeos Q
 ### Block sorting
 We now have to arrange the partition i.e. put all `0` blocks to the left of the `1` blocks. Fadesort achieves this with a stable variant of *cycle sort* that sorts the blocks in linear time.
 
-Fadesort uses a bit-array implementation with a prefix sum array to query cardinality up to a certain index; these are used to count `0` and `1` blocks. The block rearrangement tries to use less than 3 bits on average for every block. Because there are at most `floor(n / w)` blocks, sorting a partition requires `O(n / w)` space complexity -- as a result, the minimum space complexity for the overall quicksort algorithm is `Ω(√n)`.
+Fadesort uses a bit-array implementation with a prefix sum array to query cardinality up to a certain index; these are used to count `0` and `1` blocks. The block rearrangement tries to use less than 3 bits on average for every block. Because there are at most `floor(n / w)` blocks, sorting a partition requires `O(n / w)` space complexity -- as a result, the minimum space complexity for the overall quicksort algorithm is `O(√n)`.
 
 Once sorted with cycle sort, our array looks like this:
 
